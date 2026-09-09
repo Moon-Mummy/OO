@@ -28,7 +28,8 @@ It is **not** a bootable kernel yet — that is deliberate (see `docs/DECISIONS.
 ## 2. Repository facts
 
 - GitHub: `Moon-Mummy/OO`. Branch: **`arena/01a084f5-oo`** (base commit `46bc308`).
-- Current tip: `b525ad9` — pull it before you start.
+- Tip as of this writing: `f9aa8c8`. **Always `git pull --rebase` first** — several
+  agents push here daily, so treat the hash as a hint, not a checkout target.
 
 ```
 ooos/            the kernel
