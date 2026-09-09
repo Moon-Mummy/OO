@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>OO-OS — object-oriented operating system</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/static/style.css">
+<div id="term">
+  <header>
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="title">ooos@oo-os — /bin/shell</span>
+    <button id="reset" title="reboot the machine">reboot</button>
+  </header>
+  <pre id="out" aria-live="polite"></pre>
+  <form id="form" autocomplete="off">
+    <span id="ps1">$&nbsp;</span>
+    <input id="line" name="line" autofocus spellcheck="false"
+           placeholder="type a command — try: help">
+  </form>
+  <footer id="status">booting…</footer>
+</div>
+<script src="/static/terminal.js"></script>
