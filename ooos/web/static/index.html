@@ -10,6 +10,16 @@
     <button id="reset" title="reboot the machine">reboot</button>
   </header>
   <pre id="out" aria-live="polite"></pre>
+  <div id="chips">
+    <button class="chip" data-cmd="help">help</button>
+    <button class="chip" data-cmd="ls /">ls /</button>
+    <button class="chip" data-cmd="caps">caps</button>
+    <button class="chip" data-cmd="ps">ps</button>
+    <button class="chip" data-cmd="ipcdemo">ipcdemo</button>
+    <button class="chip" data-cmd="spawn counter 3 --wait">counter</button>
+    <button class="chip" data-cmd="alloc 4096; maps; memory">memory</button>
+    <button class="chip" data-cmd="objects; uptime">uptime</button>
+  </div>
   <form id="form" autocomplete="off">
     <span id="ps1">$&nbsp;</span>
     <input id="line" name="line" autofocus spellcheck="false"

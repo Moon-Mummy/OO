@@ -42,16 +42,16 @@ class Session:
 
     # -- driving ------------------------------------------------------------
 
-    def start(self) -> Tuple[str, bool]:
+    def start(self) -> Tuple[str, bool, dict]:
         return self._pump()
 
-    def execute(self, line: str) -> Tuple[str, bool]:
+    def execute(self, line: str) -> Tuple[str, bool, dict]:
         if self.finished:
-            return ("", True)
+            return ("", True, self.kernel.stats())
         self.kernel.console.push(line)
         return self._pump()
 
-    def _pump(self) -> Tuple[str, bool]:
+    def _pump(self) -> Tuple[str, bool, dict]:
         """Run the machine until it blocks on us again."""
         with self.lock:
             self.kernel.run(max_steps=200_000)
@@ -60,9 +60,9 @@ class Session:
             console = self.kernel.console
             blocked_on_us = bool(console.waiters) and not console.eof
             self.finished = not blocked_on_us and not self.kernel.sched.alive_threads()
-            return text, self.finished
+            return text, self.finished, self.kernel.stats()
 
-    def reset(self) -> Tuple[str, bool]:
+    def reset(self) -> Tuple[str, bool, dict]:
         self.kernel = Kernel(console=Console(writer=self._write))
         self.kernel.boot()
         self.buffer.clear()
@@ -163,8 +163,11 @@ class Handler(BaseHTTPRequestHandler):
                 continue
             if name == "session":
                 session = STORE.create()
-                out, done = session.start()
-                self._send_json(HTTPStatus.OK, {"id": session.id, "out": out, "done": done})
+                out, done, stats = session.start()
+                self._send_json(
+                    HTTPStatus.OK,
+                    {"id": session.id, "out": out, "done": done, "stats": stats},
+                )
                 return
             session = STORE.get(match.group(1))
             if session is None:
@@ -172,12 +175,16 @@ class Handler(BaseHTTPRequestHandler):
                 return
             payload = self._body()
             if name == "exec":
-                out, done = session.execute(str(payload.get("line", "")))
-                self._send_json(HTTPStatus.OK, {"out": out, "done": done})
+                out, done, stats = session.execute(str(payload.get("line", "")))
+                self._send_json(
+                    HTTPStatus.OK, {"out": out, "done": done, "stats": stats}
+                )
                 return
             if name == "reset":
-                out, done = session.reset()
-                self._send_json(HTTPStatus.OK, {"out": out, "done": done})
+                out, done, stats = session.reset()
+                self._send_json(
+                    HTTPStatus.OK, {"out": out, "done": done, "stats": stats}
+                )
                 return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": f"no route for {path}"})
 

@@ -6,6 +6,7 @@ const input = document.getElementById("line");
 const status = document.getElementById("status");
 const resetBtn = document.getElementById("reset");
 const ps1 = document.getElementById("ps1");
+const chips = document.querySelectorAll(".chip");
 
 let sessionId = null;
 let halted = false;
@@ -17,9 +18,25 @@ function paint(text) {
   out.scrollTop = out.scrollHeight;
 }
 
-function setStatus(text, isHalted) {
-  status.textContent = text;
-  status.classList.toggle("halted", Boolean(isHalted));
+function setStatus(stats, isHalted) {
+  const parts = [];
+  if (isHalted) parts.push('<span class="halted">machine halted — press reboot</span>');
+  if (stats) {
+    parts.push(`tick ${stats.ticks}`);
+    parts.push(`${stats.processes} procs`);
+    parts.push(`${stats.objects} objects`);
+    parts.push(`${stats.used_frames}/${stats.total_frames} frames`);
+    parts.push(`${stats.syscalls} syscalls`);
+  }
+  status.innerHTML = parts.join("<span> · </span>") || "ready";
+}
+
+function syncInput() {
+  input.disabled = halted;
+  input.placeholder = halted
+    ? "machine halted — press reboot"
+    : "type a command — try: help";
+  if (!halted) input.focus();
 }
 
 function updatePrompt() {
@@ -44,29 +61,27 @@ async function api(path, body) {
   return response.json();
 }
 
-async function boot() {
-  const data = await api("/api/session", {});
-  sessionId = data.id;
-  halted = data.done;
-  paint(data.out);
+function apply(data) {
+  paint(data.out || "");
+  halted = Boolean(data.done);
   updatePrompt();
-  setStatus(halted ? "machine halted — press reboot" : "ready — type 'help'", halted);
+  setStatus(data.stats, halted);
+  syncInput();
+}
+
+async function boot() {
+  apply(await api("/api/session", {}));
 }
 
 async function send(line) {
   if (sessionId === null || halted) return;
   input.disabled = true;
   try {
-    const data = await api(`/api/session/${sessionId}/exec`, { line });
-    paint(data.out);
-    halted = data.done;
-    updatePrompt();
-    if (halted) setStatus("machine halted — press reboot", true);
+    apply(await api(`/api/session/${sessionId}/exec`, { line }));
   } catch (error) {
     paint(`\n[net] ${error}\n`);
   } finally {
-    input.disabled = false;
-    input.focus();
+    syncInput();
   }
 }
 
@@ -96,19 +111,29 @@ input.addEventListener("keydown", (event) => {
   }
 });
 
+chips.forEach((chip) => {
+  chip.addEventListener("click", () => {
+    if (halted) return;
+    paint(chip.dataset.cmd + "\n");
+    send(chip.dataset.cmd);
+    input.focus();
+  });
+});
+
 resetBtn.addEventListener("click", async () => {
   if (sessionId === null) return;
   out.textContent = "";
   halted = false;
-  const data = await api(`/api/session/${sessionId}/reset`, {});
-  paint(data.out);
-  halted = data.done;
-  updatePrompt();
-  setStatus(halted ? "machine halted — press reboot" : "rebooted", halted);
-  input.focus();
+  syncInput();
+  try {
+    apply(await api(`/api/session/${sessionId}/reset`, {}));
+  } catch (error) {
+    paint(`[net] ${error}\n`);
+  }
 });
 
 boot().catch((error) => {
   paint(`[net] cannot reach the kernel: ${error}\n`);
-  setStatus("offline", true);
+  status.innerHTML = '<span class="halted">offline</span>';
+  syncInput();
 });
