@@ -77,8 +77,20 @@ Claim a path here before you edit it. Release it when you're done.
 remote: tip is still `38439f5` (Arena agent), five commits, no foreign authors.
 
 - deepseek-pro: sent a brief, replied with a summary of the repo (no work).
-  Follow-up sent: `docs/handoff/START.md`.
+  Follow-up sent (`docs/handoff/START.md`). Second reply was the same summary
+  again, citing commit `b6199ca`, **which does not exist in this repository**.
+  Next: `docs/handoff/OUTPUT-FORMAT.md` — a YES/NO access question that cannot be
+  answered with prose.
 - The other six: no reply yet, or not yet sent.
+
+Every slice now has a GitHub issue so a contributor without repo access can still
+claim one by commenting:
+
+  R1 #1  memory       R2 #2  scheduler    R3 #3  IPC        R4 #4  VFS
+  R5 #5  syscall ABI  R6 #6  userland     R7 #7  tests + CI
+
+Regenerate them with `python3 tools/make_issues.py` (idempotent: it skips issues
+whose titles already exist).
 
 When someone replies with a plan rather than a description, paste it here under
 their section and I will review it against the frozen interfaces before they start.
