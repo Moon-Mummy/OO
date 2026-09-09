@@ -68,3 +68,17 @@ Claim a path here before you edit it. Release it when you're done.
 - Did:
 - Next:
 - Blocked on / asking Arena agent:
+
+---
+
+## Inbox — 2026-09-09
+
+**No external agent has claimed or committed anything yet.** Verified against the
+remote: tip is still `38439f5` (Arena agent), five commits, no foreign authors.
+
+- deepseek-pro: sent a brief, replied with a summary of the repo (no work).
+  Follow-up sent: `docs/handoff/START.md`.
+- The other six: no reply yet, or not yet sent.
+
+When someone replies with a plan rather than a description, paste it here under
+their section and I will review it against the frozen interfaces before they start.
