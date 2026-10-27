@@ -18,20 +18,20 @@ Every workflow run, pull request check, branch check suite, release tag check su
 | **External Commit Status (`Vercel` on `apps/landing`)** | 335 | 325 | **10** | 0 | **10 / 10 (100%)** |
 | **TOTAL NON-GREEN CHECKS** | — | — | **221 failed** | **7 cancelled** | **228 / 228 (100%)** |
 
-> **Why the issues are staged here with 1-command publisher scripts:**  
-> Inside Arena's sandbox, an outbound network proxy intercepts all HTTPS requests to `api.github.com` and replaces the `Authorization` header at the network boundary with Arena's managed GitHub App token (`X-Oauth-Client-Id: Iv23lifFg4c9eT1T6hLC`), which only has `"issues": "read"` permission (`HTTP 403 — Resource not accessible by integration`). Even passing a custom `GH_TOKEN` inside the sandbox is overwritten by that network proxy.  
-> Run **one command** from your **own local terminal** (outside the sandbox, where `gh` is logged in):
->
-> **Linux / macOS / Git Bash:**
-> ```bash
-> git clone -b arena/c2246873-oo https://github.com/Moon-Mummy/OO.git && bash OO/greeneek-failed-checks-issues/open-all-issues.sh
-> ```
+> **How to publish all 8 issues from this `.zip` in one command (after unzipping locally):**  
+> Inside Arena's sandbox, an outbound network proxy intercepts all HTTPS requests to `api.github.com` and replaces the `Authorization` header with Arena's managed GitHub App token (`X-Oauth-Client-Id: Iv23lifFg4c9eT1T6hLC`), which only has `"issues": "read"` permission (`HTTP 403 — Resource not accessible by integration`).  
+> Unzip `greeneek-failed-checks-issues.zip` on **your own machine** (where `gh auth login` is logged into GitHub) and run **one** command:
 >
 > **Windows PowerShell (`pwsh`, no `jq` needed):**
 > ```powershell
-> git clone -b arena/c2246873-oo https://github.com/Moon-Mummy/OO.git; pwsh OO/greeneek-failed-checks-issues/open-all-issues.ps1
+> pwsh ./greeneek-failed-checks-issues/open-all-issues.ps1
 > ```
-> *(Preview first with `--dry-run` on Bash or `-DryRun` on PowerShell.)*
+>
+> **Linux / macOS / WSL / Git Bash:**
+> ```bash
+> bash ./greeneek-failed-checks-issues/open-all-issues.sh
+> ```
+> *(Preview first with `-DryRun` on PowerShell or `--dry-run` on Bash — or open any of the `01-*.md` .. `08-*.md` files directly to copy-paste into GitHub Issues.)*
 
 ---
 
